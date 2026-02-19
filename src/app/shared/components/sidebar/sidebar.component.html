@@ -1,0 +1,41 @@
+<div class="sidebar" [class.open]="isOpen">
+  <div class="sidebar-header">
+    <div class="logo" routerLink="/user/dashboard">
+      <div class="logo-icon">
+        <img src="assets/images/logo.png" alt="TrackMint Logo" class="logo-image">
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="menu-list">
+      <li
+        *ngFor="let item of menuItems"
+        class="menu-item"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)">
+        <span class="material-icons menu-icon">{{ item.icon }}</span>
+        <span class="menu-label">{{ item.label }}</span>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-profile" (click)="navigateToProfile()">
+      <div class="user-avatar">
+        <span class="avatar-text">{{ userName.charAt(0).toUpperCase() }}</span>
+      </div>
+      <div class="user-info">
+        <div class="user-name">{{ userName }}</div>
+        <div class="user-type">{{ userType }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div
+  class="sidebar-backdrop"
+  [class.visible]="isOpen"
+  (click)="onBackdropClick()">
+</div>

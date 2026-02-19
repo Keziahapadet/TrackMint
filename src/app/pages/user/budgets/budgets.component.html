@@ -1,0 +1,294 @@
+
+
+<div class="budgets-page">
+ 
+  <div class="page-header">
+    <h2>Monthly Budgets</h2>
+    <div class="header-actions">
+      <button class="create-btn" (click)="openModal()">
+        Create Budget
+      </button>
+    </div>
+  </div>
+
+
+  <div class="budgets-grid">
+  
+    <div class="budget-card">
+      <div class="budget-header">
+        <div class="budget-icon" style="background: rgba(16, 185, 129, 0.1);">
+          <span class="material-icons" style="color: #10B981;">restaurant</span>
+        </div>
+        <div class="budget-info">
+          <h3>Food & Dining</h3>
+          <div class="budget-amount">
+            <span class="spent">ksh.680</span>
+            <span class="total"> of ksh.800 spent</span>
+          </div>
+        </div>
+        <div class="budget-percentage">
+          85%
+        </div>
+      </div>
+
+ 
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 85%; background: #10B981;"></div>
+      </div>
+
+    
+      <div class="budget-footer">
+        <div class="remaining">
+          <strong>ksh.120 left</strong>
+        </div>
+        <div class="budget-actions">
+          <button class="edit-btn" title="Edit budget">
+            <span class="material-icons">edit</span>
+          </button>
+          <button class="delete-btn" title="Delete budget">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  
+    <div class="budget-card">
+ 
+      <div class="budget-header">
+        <div class="budget-icon" style="background: rgba(99, 102, 241, 0.1);">
+          <span class="material-icons" style="color: #6366F1;">directions_car</span>
+        </div>
+        <div class="budget-info">
+          <h3>Transportation</h3>
+          <div class="budget-amount">
+            <span class="spent">ksh.320</span>
+            <span class="total"> of ksh.500 spent</span>
+          </div>
+        </div>
+        <div class="budget-percentage">
+          64%
+        </div>
+      </div>
+
+ 
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 64%; background: #6366F1;"></div>
+      </div>
+
+
+      <div class="budget-footer">
+        <div class="remaining">
+          <strong>ksh.180 left</strong>
+        </div>
+        <div class="budget-actions">
+          <button class="edit-btn" title="Edit budget">
+            <span class="material-icons">edit</span>
+          </button>
+          <button class="delete-btn" title="Delete budget">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="budget-card">
+ 
+      <div class="budget-header">
+        <div class="budget-icon" style="background: rgba(168, 85, 247, 0.1);">
+          <span class="material-icons" style="color: #A855F7;">shopping_cart</span>
+        </div>
+        <div class="budget-info">
+          <h3>Shopping</h3>
+          <div class="budget-amount">
+            <span class="spent">ksh.150</span>
+            <span class="total"> of ksh.400 spent</span>
+          </div>
+        </div>
+        <div class="budget-percentage">
+          38%
+        </div>
+      </div>
+
+    
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 38%; background: #A855F7;"></div>
+      </div>
+
+      <div class="budget-footer">
+        <div class="remaining">
+          <strong>ksh.250 left</strong>
+        </div>
+        <div class="budget-actions">
+          <button class="edit-btn" title="Edit budget">
+            <span class="material-icons">edit</span>
+          </button>
+          <button class="delete-btn" title="Delete budget">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  
+    <div class="budget-card over-budget">
+      
+      <div class="budget-header">
+        <div class="budget-icon" style="background: rgba(236, 72, 153, 0.1);">
+          <span class="material-icons" style="color: #EC4899;">movie</span>
+        </div>
+        <div class="budget-info">
+          <h3>Entertainment</h3>
+          <div class="budget-amount">
+            <span class="spent">ksh.220</span>
+            <span class="total"> of ksh.200 spent</span>
+            <span class="over-badge">
+              <span class="material-icons">warning</span>
+              Over budget!
+            </span>
+          </div>
+        </div>
+        <div class="budget-percentage over-budget">
+          110%
+        </div>
+      </div>
+
+   
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 100%; background: #EF4444;"></div>
+      </div>
+
+  
+      <div class="budget-footer">
+        <div class="remaining over">
+          <strong>$20 over</strong>
+        </div>
+        <div class="budget-actions">
+          <button class="edit-btn" title="Edit budget">
+            <span class="material-icons">edit</span>
+          </button>
+          <button class="delete-btn" title="Delete budget">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-title-section">
+        <div class="modal-icon">
+          <span class="material-icons">{{ isEditing ? 'edit' : 'add_circle' }}</span>
+        </div>
+        <h3 class="modal-title">{{ isEditing ? 'Edit Budget' : 'Create New Budget' }}</h3>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+ 
+    <div class="modal-body" [formGroup]="budgetForm">
+
+    
+      <div class="form-group">
+        <label class="form-label">
+          <span class="material-icons">category</span>
+          Category
+        </label>
+        <div class="select-wrapper">
+          <select class="form-input" formControlName="category">
+            <option *ngFor="let cat of categories" [value]="cat.name">
+              {{ cat.name }}
+            </option>
+          </select>
+          <span class="material-icons select-arrow">expand_more</span>
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label class="form-label">
+          <span class="material-icons">attach_money</span>
+          Budget Amount
+        </label>
+        <div class="amount-wrapper">
+          <span class="currency">ksh.</span>
+          <input
+            type="number"
+            class="form-input amount-input"
+            placeholder="0.00"
+            formControlName="amount"
+            step="0.01"
+            min="0">
+        </div>
+        <span class="error-msg"
+          *ngIf="budgetForm.get('amount')?.invalid && budgetForm.get('amount')?.touched">
+          Valid amount is required
+        </span>
+      </div>
+
+ 
+      <div class="form-group">
+        <label class="form-label">
+          <span class="material-icons">receipt</span>
+          Already Spent (optional)
+        </label>
+        <div class="amount-wrapper">
+          <span class="currency">ksh.</span>
+          <input
+            type="number"
+            class="form-input amount-input"
+            placeholder="0.00"
+            formControlName="spent"
+            step="0.01"
+            min="0">
+        </div>
+      </div>
+
+
+      <div class="budget-preview" *ngIf="budgetForm.get('amount')?.value">
+        <div class="preview-label">Preview</div>
+        <div class="preview-track">
+          <div
+            class="preview-fill"
+            [style.width]="getProgressWidth(
+              budgetForm.get('spent')?.value || 0,
+              budgetForm.get('amount')?.value
+            ) + '%'"
+            [style.background]="getProgressColor(
+              budgetForm.get('spent')?.value || 0,
+              budgetForm.get('amount')?.value
+            )">
+          </div>
+        </div>
+        <div class="preview-text">
+          {{ getPercentage(
+            budgetForm.get('spent')?.value || 0,
+            budgetForm.get('amount')?.value
+          ) }}% used
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal-footer">
+      <button class="cancel-btn" (click)="closeModal()">
+        Cancel
+      </button>
+      <button
+        class="save-btn"
+        (click)="saveBudget()"
+        [disabled]="budgetForm.invalid">
+        <span class="material-icons">{{ isEditing ? 'save' : 'add' }}</span>
+        {{ isEditing ? 'Save Changes' : 'Create Budget' }}
+      </button>
+    </div>
+  </div>
+</div>

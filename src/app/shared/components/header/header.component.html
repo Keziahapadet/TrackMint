@@ -1,0 +1,126 @@
+<header class="header" (click)="closeDropdowns()">
+  <div class="header-content">
+
+    <!-- Hamburger Button -->
+    <button
+      class="hamburger-btn"
+      
+      (click)="onHamburgerClick($event)"
+      aria-label="Toggle menu">
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+
+    <!-- Welcome Section -->
+    <div class="header-left">
+      <div class="welcome-section">
+        <h1 class="welcome-title">Welcome back, {{ userName }}!</h1>
+        <p class="welcome-subtitle">{{ currentDate }}</p>
+      </div>
+    </div>
+
+    <!-- Right Section -->
+    <div class="header-right">
+
+      <!-- Search -->
+      <div class="search-container" (click)="$event.stopPropagation()">
+        <form [formGroup]="searchForm" class="search-box">
+          <span class="material-icons search-icon">search</span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search transactions, categories, budgets..."
+            formControlName="query">
+        </form>
+
+        <div class="search-results" *ngIf="showSearchResults">
+          <div class="search-results-header">
+            <span class="results-title">Search Results</span>
+            <span class="results-count">{{ filteredResults.length }} found</span>
+          </div>
+
+          <ul class="results-list" *ngIf="filteredResults.length > 0">
+            <li
+              *ngFor="let result of filteredResults"
+              class="result-item"
+              (click)="selectSearchResult(result)">
+              <span class="material-icons result-icon">
+                {{ result.type === 'transaction' ? 'receipt' :
+                   result.type === 'category'    ? 'category' :
+                   'account_balance_wallet' }}
+              </span>
+              <div class="result-info">
+                <div class="result-title">{{ result.title }}</div>
+                <div class="result-subtitle">{{ result.subtitle }}</div>
+              </div>
+            </li>
+          </ul>
+
+          <div class="search-results-footer" *ngIf="filteredResults.length === 0">
+            <span class="no-results">
+              No results found for "{{ searchForm.get('query')?.value }}"
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="notification-container" (click)="$event.stopPropagation()">
+        <button class="icon-button" (click)="toggleNotifications()">
+          <span class="material-icons">notifications</span>
+          <span class="notification-badge" *ngIf="unreadCount > 0">
+            {{ unreadCount }}
+          </span>
+        </button>
+
+        <div class="dropdown notification-dropdown" *ngIf="showNotifications">
+          <div class="dropdown-header">
+            <span class="dropdown-title">Notifications</span>
+            <button class="text-button" (click)="markAllAsRead()">
+              Mark all as read
+            </button>
+          </div>
+
+          <ul class="notification-list" *ngIf="notifications.length > 0">
+            <li
+              *ngFor="let notification of notifications"
+              class="notification-item"
+              [class.unread]="!notification.read"
+              [class.warning]="notification.type === 'warning'"
+              [class.success]="notification.type === 'success'"
+              [class.info]="notification.type === 'info'"
+              (click)="markNotificationAsRead(notification.id)">
+
+              <div class="notification-icon">
+                <span class="material-icons">
+                  {{ notification.type === 'warning' ? 'warning' :
+                     notification.type === 'success' ? 'check_circle' :
+                     'info' }}
+                </span>
+              </div>
+
+              <div class="notification-content">
+                <div class="notification-title">{{ notification.title }}</div>
+                <div class="notification-message">{{ notification.message }}</div>
+                <div class="notification-time">{{ notification.time }}</div>
+              </div>
+            </li>
+          </ul>
+
+          <div class="no-notifications" *ngIf="notifications.length === 0">
+            <span class="material-icons">notifications_none</span>
+            <p>No notifications</p>
+          </div>
+
+          <div class="dropdown-footer">
+            <button class="text-button clear-all" (click)="clearAllNotifications()">
+              Clear all notifications
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>

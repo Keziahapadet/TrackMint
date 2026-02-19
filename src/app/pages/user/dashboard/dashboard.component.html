@@ -1,0 +1,129 @@
+
+
+
+
+<div class="dashboard">
+
+  <div class="summary-cards">
+    <div 
+      *ngFor="let card of summaryCards" 
+      class="summary-card"
+      [style.border-left-color]="card.color">
+      <div class="card-header">
+        <div class="card-icon" [style.background]="card.color + '20'">
+          <span class="material-icons" [style.color]="card.color">{{ card.icon }}</span>
+        </div>
+        <div class="card-trend" [class.positive]="card.trend === 'up'" [class.negative]="card.trend === 'down'">
+          <span class="material-icons trend-icon">
+            {{ card.trend === 'up' ? 'arrow_upward' : 'arrow_downward' }}
+          </span>
+          <span class="trend-text">{{ card.percentage }}</span>
+        </div>
+      </div>
+      <div class="card-content">
+        <p class="card-title">{{ card.title }}</p>
+        <h2 class="card-amount">ksh.{{ card.amount | number:'1.2-2' }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="card spending-overview">
+      <div class="card-header-row">
+        <h3 class="card-title-text">Spending Overview</h3>
+        <div class="period-selector">
+          <button 
+            class="period-btn"
+            [class.active]="selectedPeriod === 'This Week'"
+            (click)="changePeriod('This Week')">
+            This Week
+          </button>
+          <button 
+            class="period-btn"
+            [class.active]="selectedPeriod === 'This Month'"
+            (click)="changePeriod('This Month')">
+            This Month
+          </button>
+          <button 
+            class="period-btn"
+            [class.active]="selectedPeriod === 'This Year'"
+            (click)="changePeriod('This Year')">
+            This Year
+          </button>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <div class="bar-chart">
+          <div *ngFor="let value of spendingChartData.values; let i = index" class="bar-wrapper">
+            <div class="bar-container">
+              <div 
+                class="bar" 
+                [style.height]="(value / 300 * 100) + '%'"
+                [title]="'ksh.' + value">
+              </div>
+            </div>
+            <span class="bar-label">{{ spendingChartData.labels[i] }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card category-spending">
+      <div class="card-header-row">
+        <h3 class="card-title-text">By Category</h3>
+        <button class="view-all-btn" (click)="navigateToCategory('')">View All</button>
+      </div>
+
+      <div class="category-list">
+        <div 
+          *ngFor="let category of categorySpending" 
+          class="category-item"
+          (click)="navigateToCategory(category.name)">
+          <div class="category-info">
+            <div class="category-color" [style.background]="category.color"></div>
+            <span class="category-name">{{ category.name }}</span>
+          </div>
+          <div class="category-amount">
+            <span class="amount">ksh.{{ category.amount }}</span>
+            <span class="material-icons arrow">chevron_right</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+ 
+    <div class="card recent-transactions">
+      <div class="card-header-row">
+        <h3 class="card-title-text">Recent Transactions</h3>
+        <button class="view-all-btn" (click)="viewAllTransactions()">View All</button>
+      </div>
+
+      <div class="transactions-list">
+        <div 
+          *ngFor="let transaction of recentTransactions" 
+          class="transaction-item">
+          <div class="transaction-icon" [style.background]="transaction.color + '20'">
+            <span class="material-icons" [style.color]="transaction.color">
+              {{ transaction.icon }}
+            </span>
+          </div>
+          <div class="transaction-details">
+            <p class="transaction-description">{{ transaction.description }}</p>
+            <p class="transaction-meta">
+              <span class="transaction-category">{{ transaction.category }}</span>
+              <span class="transaction-separator">•</span>
+              <span class="transaction-date">{{ transaction.date }}</span>
+            </p>
+          </div>
+          <div 
+            class="transaction-amount"
+            [class.positive]="transaction.amount > 0"
+            [class.negative]="transaction.amount < 0">
+            {{ transaction.amount > 0 ? '+' : '' }}ksh.{{ transaction.amount | number:'1.2-2' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

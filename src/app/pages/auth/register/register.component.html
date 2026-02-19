@@ -1,0 +1,118 @@
+<div class="register-container">
+  <div class="register-card">
+    
+    <div class="logo-section">
+      <img src="assets/images/logo.png" alt="TrackMint" class="logo">
+    </div>
+
+    <h2 class="heading">Create Account</h2>
+    <p class="subheading">Sign up to start tracking your expenses</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <div class="input-wrap">
+          <input
+            id="fullName"
+            type="text"
+            formControlName="fullName"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            [class.error]="fullName?.invalid && (fullName?.dirty || fullName?.touched)"
+             [disabled]="isLoading"
+          />
+        </div>
+        <div class="error-message" *ngIf="fullName?.invalid && (fullName?.dirty || fullName?.touched)">
+          <span *ngIf="fullName?.errors?.['required']">Full name is required</span>
+          <span *ngIf="fullName?.errors?.['minlength']">Full name must be at least 3 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <div class="input-wrap">
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email address"
+            autocomplete="email"
+            [class.error]="email?.invalid && (email?.dirty || email?.touched)"
+             [disabled]="isLoading"
+          />
+        </div>
+        <div class="error-message" *ngIf="email?.invalid && (email?.dirty || email?.touched)">
+          <span *ngIf="email?.errors?.['required']">Email is required</span>
+          <span *ngIf="email?.errors?.['email']">Please enter a valid email address</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="new-password"
+            [class.error]="password?.invalid && (password?.dirty || password?.touched)"
+             [disabled]="isLoading"
+          />
+          <button
+            type="button"
+            class="toggle-btn"
+            (click)="togglePasswordVisibility()"
+            aria-label="Toggle password visibility"
+          >
+            <mat-icon>{{ showPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="password?.invalid && (password?.dirty || password?.touched)">
+          <span *ngIf="password?.errors?.['required']">Password is required</span>
+          <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="input-wrap">
+          <input
+            id="confirmPassword"
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            autocomplete="new-password"
+            [class.error]="confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)"
+             [disabled]="isLoading"
+          />
+          <button
+            type="button"
+            class="toggle-btn"
+            (click)="toggleConfirmPasswordVisibility()"
+            aria-label="Toggle confirm password visibility"
+          >
+            <mat-icon>{{ showConfirmPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)">
+          <span *ngIf="confirmPassword?.errors?.['required']">Please confirm your password</span>
+          <span *ngIf="confirmPassword?.errors?.['passwordMismatch']">Passwords do not match</span>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isLoading || registerForm.invalid">
+        <span *ngIf="!isLoading">Create Account</span>
+        <span *ngIf="isLoading">Creating account...</span>
+      </button>
+
+    </form>
+
+    <p class="login-link">
+      Already have an account? <a routerLink="/login"
+       [class.disabled]="isLoading">Log in</a>
+    </p>
+
+  </div>
+</div>
