@@ -3,23 +3,17 @@
 export interface Transaction {
   id: string;
   description: string;
-  category:string;
-  categoryIcon:string;
-  type:'income' | 'expense';
+  category: string;
   amount: number;
+  type: 'INCOME' | 'EXPENSE';
   date: string;
-  color:string;
-  note?:string;
 }
-
-export interface TransactionRequest{
-description:string;
-category:string;
-type:'income' | 'expense';
-amount:number;
- date: string;
-  note?:string;
-
+export interface TransactionRequest {
+  description: string;
+  category: string;
+  amount: number;
+  type: 'INCOME' | 'EXPENSE';
+  date?: string;
 }
 export interface TransactionResponse{
 

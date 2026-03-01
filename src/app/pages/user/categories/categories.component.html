@@ -1,0 +1,170 @@
+<div class="categories-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Categories</h2>
+      <p class="page-subtitle">Manage your transaction categories</p>
+    </div>
+    <button class="add-btn" (click)="openModal()">
+      <span class="material-icons">add</span>
+      Add Category
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading categories...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="errorMessage && !isLoading">
+    <div class="error-icon">
+      <span class="material-icons">error</span>
+    </div>
+    <p class="error-message">{{ errorMessage }}</p>
+    <button class="retry-btn" (click)="retryLoading()">
+      <span class="material-icons">refresh</span>
+      Try Again
+    </button>
+  </div>
+
+  <!-- Categories Grid -->
+  <div class="categories-grid" *ngIf="!isLoading && !errorMessage">
+    <div *ngFor="let category of categories" class="category-card">
+      <div class="category-header">
+        <div class="category-icon" [style.background]="category.color + '20'">
+          <span class="material-icons" [style.color]="category.color">
+            {{ category.icon }}
+          </span>
+        </div>
+        <div class="category-info">
+          <h3 class="category-name">{{ category.name }}</h3>
+          <p class="category-stats">
+            <span class="transaction-count">{{ category.transactionCount || 0 }} transactions</span>
+          </p>
+        </div>
+        <div class="category-actions">
+          <button class="action-btn edit" (click)="editCategory(category)" title="Edit category">
+            <span class="material-icons">edit</span>
+          </button>
+          <button class="action-btn delete" (click)="deleteCategory(category.id)" title="Delete category">
+            <span class="material-icons">delete</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="category-footer">
+        <div class="total-spent">
+          <span class="label">Total Spent</span>
+          <span class="amount">ksh {{ category.totalSpent || 0 | number:'1.2-2' }}</span>
+        </div>
+        <div class="color-indicator" [style.background]="category.color"></div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="categories.length === 0">
+      <div class="empty-icon">
+        <span class="material-icons">category</span>
+      </div>
+      <h3 class="empty-title">No categories yet</h3>
+      <p class="empty-subtitle">Create your first category to organize your transactions</p>
+      <button class="add-btn" (click)="openModal()">
+        <span class="material-icons">add</span>
+        Add Category
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Category Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-section">
+        <span class="material-icons modal-icon">{{ isEditing ? 'edit' : 'add_circle' }}</span>
+        <h3 class="modal-title">{{ isEditing ? 'Edit Category' : 'Add New Category' }}</h3>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()">
+      <div class="modal-body">
+        <!-- Category Name -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="material-icons">label</span>
+            Category Name
+          </label>
+          <input type="text" class="form-input" formControlName="name" 
+                 placeholder="e.g. Food & Dining, Shopping...">
+          <div class="error-msg" *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched">
+            <span class="material-icons">error</span>
+            Category name is required
+          </div>
+        </div>
+
+        <!-- Icon Selection -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="material-icons">emoji_emotions</span>
+            Choose Icon
+          </label>
+          <div class="icon-grid">
+            <div *ngFor="let icon of icons" 
+                 class="icon-option"
+                 [class.selected]="selectedIcon === icon"
+                 (click)="selectIcon(icon)">
+              <span class="material-icons">{{ icon }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Color Selection -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="material-icons">color_lens</span>
+            Choose Color
+          </label>
+          <div class="color-grid">
+            <div *ngFor="let color of colors" 
+                 class="color-option"
+                 [style.background]="color"
+                 [class.selected]="selectedColor === color"
+                 (click)="selectColor(color)">
+              <span class="material-icons check" *ngIf="selectedColor === color">check</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-section">
+          <label class="form-label">Preview</label>
+          <div class="preview-card">
+            <div class="preview-icon" [style.background]="selectedColor + '20'">
+              <span class="material-icons" [style.color]="selectedColor">{{ selectedIcon }}</span>
+            </div>
+            <div class="preview-details">
+              <span class="preview-name">{{ categoryForm.get('name')?.value || 'Category Name' }}</span>
+              <span class="preview-stats">0 transactions</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="cancel-btn" (click)="closeModal()">
+          <span class="material-icons">close</span>
+          Cancel
+        </button>
+        <button type="submit" class="save-btn" [disabled]="categoryForm.invalid">
+          <span class="material-icons">{{ isEditing ? 'save' : 'add' }}</span>
+          {{ isEditing ? 'Update' : 'Create' }} Category
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -61,7 +61,7 @@ export class ForgotPasswordComponent implements OnInit {
           this.emailSent = true;
           this.showMessage('Password reset link sent to your email!', false);
         } else {
-          this.showMessage(response.error || 'Failed to send reset link', true);
+          
         }
       },
       error: (err) => {

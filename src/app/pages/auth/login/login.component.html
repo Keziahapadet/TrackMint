@@ -20,7 +20,6 @@
             placeholder="Enter your email address"
             autocomplete="email"
             [class.error]="email?.invalid && email?.touched"
-            [disabled]="isLoading"
           />
         </div>
         <div class="error-message" *ngIf="email?.invalid && email?.touched">
@@ -39,7 +38,6 @@
             placeholder="Enter your password"
             autocomplete="current-password"
             [class.error]="password?.invalid && password?.touched"
-            [disabled]="isLoading"
           />
           <button
             type="button"
@@ -57,21 +55,22 @@
       </div>
 
       <div class="forgot-password">
-        <a routerLink="/forgot-password"
-           [class.disabled]="isLoading">
-          Forgot password?</a>
+        <a routerLink="/forgot-password">Forgot password?</a>
       </div>
 
-      <button type="submit" class="submit-btn" [disabled]="isLoading ||loginForm.invalid"
-      [class.loading]="isLoading">
+      <button 
+        type="submit" 
+        class="submit-btn" 
+        [disabled]="isLoading || loginForm.invalid"
+        [class.loading]="isLoading">
         <span *ngIf="isLoading">Logging in...</span>
         <span *ngIf="!isLoading">Log In</span>
       </button>
 
+      <p class="register-link">
+        Don't have an account? <a routerLink="/register">Sign up</a>
+      </p>
 
-    <p class="register-link"
-           [class.disabled]="isLoading">
-      Don't have an account? <a routerLink="/register">Sign up</a>
-    </p>
-
-  
+    </form>
+  </div>
+</div>

@@ -1,10 +1,8 @@
 <header class="header" (click)="closeDropdowns()">
   <div class="header-content">
-
     <!-- Hamburger Button -->
     <button
       class="hamburger-btn"
-      
       (click)="onHamburgerClick($event)"
       aria-label="Toggle menu">
       <span class="hamburger-bar"></span>
@@ -22,7 +20,6 @@
 
     <!-- Right Section -->
     <div class="header-right">
-
       <!-- Search -->
       <div class="search-container" (click)="$event.stopPropagation()">
         <form [formGroup]="searchForm" class="search-box">
@@ -65,7 +62,10 @@
         </div>
       </div>
 
-      <!-- Notifications -->
+      <!-- Notifications - Using the standalone component -->
+      <app-notification></app-notification>
+
+      <!-- OR if you want to keep your custom notification dropdown, use this:
       <div class="notification-container" (click)="$event.stopPropagation()">
         <button class="icon-button" (click)="toggleNotifications()">
           <span class="material-icons">notifications</span>
@@ -103,7 +103,7 @@
               <div class="notification-content">
                 <div class="notification-title">{{ notification.title }}</div>
                 <div class="notification-message">{{ notification.message }}</div>
-                <div class="notification-time">{{ notification.time }}</div>
+                <div class="notification-time">{{ notification.timeAgo }}</div>
               </div>
             </li>
           </ul>
@@ -120,7 +120,7 @@
           </div>
         </div>
       </div>
-
+      -->
     </div>
   </div>
 </header>

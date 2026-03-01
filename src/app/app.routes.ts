@@ -9,6 +9,7 @@ import { DashboardComponent } from './pages/user/dashboard/dashboard.component';
 import { TransactionsComponent } from './pages/user/transactions/transactions.component';
 import { BudgetsComponent } from './pages/user/budgets/budgets.component';
 import { LayoutComponent } from './shared/components/layout/layoutcomponent';
+import { CategoriesComponent } from './pages/user/categories/categories.component';
 
 
 export const routes: Routes = [
@@ -27,6 +28,7 @@ export const routes: Routes = [
       { path: 'dashboard',    component: DashboardComponent },
       { path: 'transactions', component: TransactionsComponent },
       { path: 'budgets',      component: BudgetsComponent },
+      { path: 'categories', component:CategoriesComponent}
     ]
   },
 

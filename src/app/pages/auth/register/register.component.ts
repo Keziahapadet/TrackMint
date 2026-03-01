@@ -21,8 +21,8 @@ export class RegisterComponent implements OnInit {
 
   registerForm!: FormGroup;
   isLoading = false;
-  showPassword = false;
-  showConfirmPassword = false;
+  showPassword = false;  
+  showConfirmPassword = false; 
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
@@ -60,13 +60,13 @@ export class RegisterComponent implements OnInit {
         setTimeout(() => this.router.navigate(['/login']), 1500);
       }
     },
-      error: (err) => {
-        this.isLoading = false;
-        this.showMessage(err.error?.message || 'Registration failed. Please try again.', true);
-      },
-      complete: () => this.isLoading = false
-    });
-  }
+    error: (err) => {
+      this.isLoading = false;
+      this.showMessage(err.error?.message || 'Registration failed. Please try again.', true);
+    },
+    complete: () => this.isLoading = false
+  });
+}
 
   private showMessage(message: string, isError: boolean): void {
     this.snackBar.open(message, 'Close', {

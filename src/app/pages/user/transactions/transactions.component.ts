@@ -1,8 +1,6 @@
-
-
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { TransactionService } from '../../../services/transaction.service';
@@ -16,43 +14,57 @@ import { Transaction, TransactionRequest } from '../../../models/transaction.int
   styleUrls: ['./transactions.component.scss']
 })
 export class TransactionsComponent implements OnInit, OnDestroy {
-  private fb                 = inject(FormBuilder);
-  private route              = inject(ActivatedRoute);
+  private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
   private transactionService = inject(TransactionService);
-  private destroy$           = new Subject<void>();
+  private destroy$ = new Subject<void>();
 
   transactionForm!: FormGroup;
   filterForm!: FormGroup;
 
-  showModal    = false;
-  isEditing    = false;
-  editingId    = '';
-  isLoading    = false;
+  showModal = false;
+  isEditing = false;
+  editingId = '';
+  isLoading = false;
   errorMessage = '';
 
- 
   Math = Math;
 
   categories = [
-    { name: 'Food & Dining',     icon: 'restaurant', color: '#10B981' },
-    { name: 'Transportation',    icon: 'directions_car', color: '#6366F1' },
-    { name: 'Shopping',          icon: 'shopping_cart', color: '#A855F7' },
-    { name: 'Entertainment',     icon: 'movie', color: '#EC4899' },
+    { name: 'Food & Dining', icon: 'restaurant', color: '#10B981' },
+    { name: 'Transportation', icon: 'directions_car', color: '#6366F1' },
+    { name: 'Shopping', icon: 'shopping_cart', color: '#A855F7' },
+    { name: 'Entertainment', icon: 'movie', color: '#EC4899' },
     { name: 'Bills & Utilities', icon: 'receipt', color: '#F59E0B' },
-    { name: 'Healthcare',        icon: 'local_hospital', color: '#14B8A6' },
-    { name: 'Income',            icon: 'attach_money', color: '#10B981' }
+    { name: 'Healthcare', icon: 'local_hospital', color: '#14B8A6' },
+    { name: 'Income', icon: 'attach_money', color: '#10B981' }
   ];
 
-  transactions: Transaction[]         = [];
+  transactions: Transaction[] = [];
   filteredTransactions: Transaction[] = [];
 
   ngOnInit(): void {
     this.initForms();
     this.loadTransactions();
+    
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
-        if (params['action'] === 'add') this.openModal();
+        if (params['action'] === 'add') {
+          this.openModal();
+        }
+      });
+
+    this.filterForm.get('category')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.applyFilters();
+      });
+
+    this.filterForm.get('period')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.applyFilters();
       });
   }
 
@@ -64,41 +76,74 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   initForms(): void {
     this.transactionForm = this.fb.group({
       description: ['', Validators.required],
-      category:    ['Food & Dining', Validators.required],
-      type:        ['expense', Validators.required],
-      amount:      ['', [Validators.required, Validators.min(0.01)]],
-      date:        [new Date().toISOString().split('T')[0], Validators.required]
+      category: ['Food & Dining', Validators.required],
+      type: ['expense', Validators.required],
+      amount: ['', [Validators.required, Validators.min(0.01)]],
+      date: [new Date().toISOString().split('T')[0], Validators.required]
     });
 
     this.filterForm = this.fb.group({
       category: ['All Categories'],
-      period:   ['This Month']
+      period: ['This Month']
     });
-
-    this.filterForm.get('category')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(selectedCategory => {
-        this.filteredTransactions = selectedCategory === 'All Categories'
-          ? this.transactions
-          : this.transactions.filter(transaction => transaction.category === selectedCategory);
-      });
   }
 
   loadTransactions(): void {
     this.isLoading = true;
+    this.errorMessage = '';
+    
     this.transactionService.getAllTransactions()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (transactions) => {
-          this.transactions         = transactions;
-          this.filteredTransactions = transactions;
-          this.isLoading            = false;
+          this.transactions = transactions;
+          this.applyFilters();
+          this.isLoading = false;
         },
-        error: () => {
-          this.errorMessage = 'Failed to load transactions';
-          this.isLoading    = false;
+        error: (error) => {
+          console.error('Error loading transactions:', error);
+          this.errorMessage = 'Failed to load transactions. Please try again.';
+          this.isLoading = false;
         }
       });
+  }
+
+  applyFilters(): void {
+    const categoryFilter = this.filterForm.get('category')?.value;
+    const periodFilter = this.filterForm.get('period')?.value;
+    
+    let filtered = [...this.transactions];
+    
+    if (categoryFilter !== 'All Categories') {
+      filtered = filtered.filter(t => t.category === categoryFilter);
+    }
+    
+    if (periodFilter !== 'All Periods') {
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      filtered = filtered.filter(t => {
+        const transactionDate = new Date(t.date);
+        
+        switch(periodFilter) {
+          case 'This Month':
+            return transactionDate.getMonth() === currentMonth && 
+                   transactionDate.getFullYear() === currentYear;
+          case 'Last Month':
+            const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+            const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+            return transactionDate.getMonth() === lastMonth && 
+                   transactionDate.getFullYear() === lastMonthYear;
+          case 'This Year':
+            return transactionDate.getFullYear() === currentYear;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    this.filteredTransactions = filtered;
   }
 
   getCategoryIcon(categoryName: string): string {
@@ -106,26 +151,28 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     return category ? category.icon : 'receipt';
   }
 
-  getCategoryByName(name: string) {
-    return this.categories.find(category => category.name === name) ?? this.categories[0];
+  getCategoryColor(categoryName: string): string {
+    const category = this.categories.find(c => c.name === categoryName);
+    return category ? category.color : '#999';
   }
 
   openModal(): void {
     this.showModal = true;
     this.isEditing = false;
+    this.editingId = '';
     this.transactionForm.reset({
       description: '',
-      category:    'Food & Dining',
-      type:        'expense',
-      amount:      '',
-      date:        new Date().toISOString().split('T')[0]
+      category: 'Food & Dining',
+      type: 'expense',
+      amount: '',
+      date: new Date().toISOString().split('T')[0]
     });
   }
 
   closeModal(): void {
-    this.showModal    = false;
-    this.isEditing    = false;
-    this.editingId    = '';
+    this.showModal = false;
+    this.isEditing = false;
+    this.editingId = '';
     this.errorMessage = '';
     this.transactionForm.reset();
   }
@@ -134,12 +181,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.isEditing = true;
     this.editingId = transaction.id;
     this.showModal = true;
+    
+    const uiType = transaction.type === 'INCOME' ? 'income' : 'expense';
+    
     this.transactionForm.patchValue({
       description: transaction.description,
-      category:    transaction.category,
-      type:        transaction.type,
-      amount:      Math.abs(transaction.amount),
-      date:        transaction.date.split('T')[0] 
+      category: transaction.category,
+      type: uiType,
+      amount: Math.abs(transaction.amount),
+      date: transaction.date.split('T')[0]
     });
   }
 
@@ -149,34 +199,44 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            this.transactions         = this.transactions.filter(transaction => transaction.id !== id);
-            this.filteredTransactions = this.filteredTransactions.filter(transaction => transaction.id !== id);
+            this.transactions = this.transactions.filter(t => t.id !== id);
+            this.applyFilters();
           },
-          error: () => {
-            this.errorMessage = 'Failed to delete transaction';
+          error: (error) => {
+            console.error('Error deleting transaction:', error);
+            this.errorMessage = 'Failed to delete transaction. Please try again.';
           }
         });
     }
   }
 
   saveTransaction(): void {
-    if (this.transactionForm.invalid) return;
+    if (this.transactionForm.invalid) {
+      Object.keys(this.transactionForm.controls).forEach(key => {
+        this.transactionForm.get(key)?.markAsTouched();
+      });
+      return;
+    }
 
     const formValue = this.transactionForm.value;
-    const category  = this.getCategoryByName(formValue.category);
-    const amount    = formValue.type === 'expense'
-                      ? -Math.abs(parseFloat(formValue.amount))
-                      :  Math.abs(parseFloat(formValue.amount));
+    
+    const apiType = formValue.type === 'income' ? 'INCOME' : 'EXPENSE';
+    
+    const amount = Math.abs(parseFloat(formValue.amount));
+
+    const date = new Date(formValue.date);
+    const formattedDate = date.toISOString();
 
     const payload: TransactionRequest = {
       description: formValue.description,
-      category:    formValue.category,
-      type:        formValue.type,
-      amount:      amount,
-      date:        formValue.date
+      category: formValue.category,
+      type: apiType,
+      amount: amount,
+      date: formattedDate
     };
 
     this.isLoading = true;
+    this.errorMessage = '';
 
     const request$ = this.isEditing
       ? this.transactionService.updateTransaction(this.editingId, payload)
@@ -188,9 +248,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.closeModal();
         this.isLoading = false;
       },
-      error: () => {
-        this.errorMessage = 'Failed to save transaction';
-        this.isLoading    = false;
+      error: (error) => {
+        console.error('Error saving transaction:', error);
+        this.errorMessage = 'Failed to save transaction. Please try again.';
+        this.isLoading = false;
       }
     });
   }

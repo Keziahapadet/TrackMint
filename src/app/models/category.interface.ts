@@ -3,7 +3,20 @@ export interface Category {
   name: string;
   icon: string;
   color: string;
-  type: 'income' | 'expense';
-  monthlySpent?: number;
+  totalSpent?: number;
   transactionCount?: number;
+  budget?: number;
+}
+
+export interface CategoryRequest {
+  name: string;
+  icon: string;
+  color: string;
+}
+
+export interface CategorySummary {
+  totalCategories: number;
+  totalSpent: number;
+  topCategory: string;
+  averagePerCategory: number;
 }

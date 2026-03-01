@@ -432,7 +432,6 @@
   }
 }
 
-// ─── Mobile ────────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .header {
     padding: 12px 16px;
@@ -448,13 +447,11 @@
     flex-wrap: nowrap;
   }
 
-  // Show hamburger
   .hamburger-btn {
     display: flex;
     flex-shrink: 0;
   }
 
-  // Welcome section shrinks but doesn't push others out
   .header-left {
     flex: 1;
     min-width: 0;
@@ -473,7 +470,6 @@
     }
   }
 
-  // Bell and search stay on the right, fixed size
   .header-right {
     display: flex;
     align-items: center;
@@ -481,7 +477,6 @@
     flex-shrink: 0;
   }
 
-  // Shrink search box on mobile
   .search-box {
     width: 130px;
 
@@ -496,7 +491,6 @@
     }
   }
 
-  // Search results full width on mobile
   .search-results {
     position: fixed;
     top: 64px;
@@ -505,7 +499,6 @@
     width: auto;
   }
 
-  // Notification dropdown full width on mobile
   .notification-dropdown.dropdown {
     position: fixed;
     top: 64px;
@@ -515,7 +508,6 @@
     width: auto;
   }
 
-  // Smaller bell button on mobile
   .icon-button {
     width: 38px;
     height: 38px;

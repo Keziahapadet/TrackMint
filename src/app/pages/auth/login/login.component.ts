@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   loginForm!: FormGroup;
   isLoading = false;
@@ -43,19 +44,21 @@ export class LoginComponent implements OnInit {
     }
 
     this.isLoading = true;
-    
+    this.cdr.detectChanges();
 
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
         this.isLoading = false;
-         if (response.success) {
-        this.showMessage(response.message || 'Login successful!', 'success');
-        setTimeout(() => this.router.navigate(['/dashboard']), 500);
-         }
+        this.cdr.detectChanges();
+        if (response.success) {
+          this.showMessage(response.message || 'Login successful!', 'success');
+          setTimeout(() => this.router.navigate(['/user/dashboard']), 1500);
+        }
       },
       error: (error) => {
         this.isLoading = false;
-        this.showMessage(error.message || 'Login failed. Please try again.', 'error');
+        this.cdr.detectChanges();
+        this.showMessage(error.error?.message || 'Login failed. Please try again.', 'error');
       }
     });
   }

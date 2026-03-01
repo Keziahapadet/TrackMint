@@ -98,7 +98,7 @@ export class ResetPasswordComponent implements OnInit {
           this.showMessage('Password reset successfully!', false);
           setTimeout(() => this.router.navigate(['/login']), 3000);
         } else {
-          this.showMessage(response.error || 'Failed to reset password', true);
+          
         }
       },
       error: (err) => {

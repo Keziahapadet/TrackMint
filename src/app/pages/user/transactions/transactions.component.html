@@ -1,8 +1,4 @@
-
-
 <div class="transactions-page">
-
-
   <div class="page-header">
     <h2 class="page-title">All Transactions</h2>
     <button class="add-btn" (click)="openModal()">
@@ -32,14 +28,10 @@
     </div>
   </div>
 
-
   <div class="transactions-list">
-    <div
-      *ngFor="let transaction of filteredTransactions"
-      class="transaction-item">
-
-      <div class="transaction-icon" [style.background]="transaction.color + '20'">
-        <span class="material-icons" [style.color]="transaction.color">
+    <div *ngFor="let transaction of filteredTransactions" class="transaction-item">
+      <div class="transaction-icon">
+        <span class="material-icons" [style.color]="getCategoryColor(transaction.category)">
           {{ getCategoryIcon(transaction.category) }}
         </span>
       </div>
@@ -47,7 +39,7 @@
       <div class="transaction-details">
         <p class="transaction-name">{{ transaction.description }}</p>
         <p class="transaction-meta">
-          <span class="category-tag" [style.color]="transaction.color">
+          <span class="category-tag" [style.color]="getCategoryColor(transaction.category)">
             {{ transaction.category }}
           </span>
           <span class="dot">•</span>
@@ -55,12 +47,11 @@
         </p>
       </div>
 
-      <div
-        class="transaction-amount"
-        [class.income]="transaction.amount > 0"
-        [class.expense]="transaction.amount < 0">
+      <div class="transaction-amount"
+           [class.income]="transaction.amount > 0"
+           [class.expense]="transaction.amount < 0">
         <span *ngIf="transaction.amount > 0">+</span>
-        ${{ Math.abs(transaction.amount) | number:'1.2-2' }}
+        Ksh {{ Math.abs(transaction.amount) | number:'1.2-2' }}
       </div>
 
       <div class="transaction-actions">
@@ -73,14 +64,23 @@
       </div>
     </div>
 
-
     <div class="loading-state" *ngIf="isLoading">
       <div class="spinner"></div>
       <p>Loading transactions...</p>
     </div>
 
-   
-    <div class="empty-state" *ngIf="!isLoading && filteredTransactions.length === 0">
+    <div class="error-state" *ngIf="errorMessage">
+      <div class="error-icon">
+        <span class="material-icons">error</span>
+      </div>
+      <p class="error-message">{{ errorMessage }}</p>
+      <button class="retry-btn" (click)="loadTransactions()">
+        <span class="material-icons">refresh</span>
+        Try Again
+      </button>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && !errorMessage && filteredTransactions.length === 0">
       <div class="empty-icon">
         <span class="material-icons">receipt_long</span>
       </div>
@@ -94,10 +94,8 @@
   </div>
 </div>
 
-
 <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
   <div class="modal" (click)="$event.stopPropagation()">
-
     <div class="modal-header">
       <div class="modal-title-section">
         <span class="material-icons modal-icon">
@@ -113,43 +111,36 @@
     </div>
 
     <div class="modal-body" [formGroup]="transactionForm">
-
- 
       <div class="type-toggle">
-        <button
-          class="type-btn expense-btn"
-          [class.active]="transactionForm.get('type')?.value === 'expense'"
-          (click)="transactionForm.patchValue({type: 'expense'})">
+        <button class="type-btn expense-btn"
+                [class.active]="transactionForm.get('type')?.value === 'expense'"
+                (click)="transactionForm.patchValue({type: 'expense'})">
           <span class="material-icons">arrow_upward</span>
           Expense
         </button>
-        <button
-          class="type-btn income-btn"
-          [class.active]="transactionForm.get('type')?.value === 'income'"
-          (click)="transactionForm.patchValue({type: 'income'})">
+        <button class="type-btn income-btn"
+                [class.active]="transactionForm.get('type')?.value === 'income'"
+                (click)="transactionForm.patchValue({type: 'income'})">
           <span class="material-icons">arrow_downward</span>
           Income
         </button>
       </div>
 
-   
       <div class="form-group">
         <label class="form-label">
           <span class="material-icons">description</span>
           Description
         </label>
-        <input
-          type="text"
-          class="form-input"
-          placeholder="e.g. Grocery Store, Netflix..."
-          formControlName="description">
+        <input type="text"
+               class="form-input"
+               placeholder="e.g. Grocery Store, Netflix..."
+               formControlName="description">
         <span class="error-msg" *ngIf="transactionForm.get('description')?.invalid && transactionForm.get('description')?.touched">
           <span class="material-icons">error</span>
           Description is required
         </span>
       </div>
 
-    
       <div class="form-group">
         <label class="form-label">
           <span class="material-icons">attach_money</span>
@@ -157,20 +148,18 @@
         </label>
         <div class="amount-wrapper">
           <span class="currency">ksh</span>
-          <input
-            type="number"
-            class="form-input amount-input"
-            placeholder="0.00"
-            formControlName="amount"
-            step="0.01"
-            min="0">
+          <input type="number"
+                 class="form-input amount-input"
+                 placeholder="0.00"
+                 formControlName="amount"
+                 step="0.01"
+                 min="0">
         </div>
         <span class="error-msg" *ngIf="transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched">
           <span class="material-icons">error</span>
           Valid amount is required
         </span>
       </div>
-
 
       <div class="form-group">
         <label class="form-label">
@@ -187,16 +176,14 @@
         </div>
       </div>
 
-      <!-- Date -->
       <div class="form-group">
         <label class="form-label">
           <span class="material-icons">calendar_today</span>
           Date
         </label>
-        <input
-          type="date"
-          class="form-input"
-          formControlName="date">
+        <input type="date"
+               class="form-input"
+               formControlName="date">
       </div>
     </div>
 
@@ -205,12 +192,12 @@
         <span class="material-icons">close</span>
         Cancel
       </button>
-      <button
-        class="save-btn"
-        (click)="saveTransaction()"
-        [disabled]="transactionForm.invalid">
+      <button class="save-btn"
+              (click)="saveTransaction()"
+              [disabled]="transactionForm.invalid || isLoading">
         <span class="material-icons">{{ isEditing ? 'save' : 'add' }}</span>
-        {{ isEditing ? 'Update' : 'Add Transaction' }}
+        <span *ngIf="!isLoading">{{ isEditing ? 'Update' : 'Add Transaction' }}</span>
+        <span *ngIf="isLoading">Saving...</span>
       </button>
     </div>
   </div>

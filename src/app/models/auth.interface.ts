@@ -1,35 +1,20 @@
-import { User } from "./user.interface";
-
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  token: string;
+  fullName: string;
+  email: string;
+}
 export interface RegisterRequest {
-
-    email: string;
-    password: string;
-    confirmPassword: string;
-    fullName: string;
-
-
+  fullName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
 }
 
-export interface AuthResponse{
-    success: boolean;
-     message?: string;
-    data: {
-
-        token:string;
-        user: User;
-expiresIn?: number;
-
-    };
-    error?: string
-
-
-}
-
-export interface LoginRequest{
-    email:string;
-    password:string;
-
-
+export interface LoginRequest {
+  email: string;
+  password: string;
 }
 
 export interface ResetPasswordRequest{
@@ -41,6 +26,5 @@ export interface ResetPasswordRequest{
 }
 
 export interface ForgotPasswordRequest{
-
     email:string
 }

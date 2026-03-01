@@ -10,7 +10,6 @@ import {
   ResetPasswordRequest,
 } from '../models/auth.interface';
 
-
 @Injectable({
   providedIn: 'root',
 })
@@ -25,26 +24,27 @@ export class AuthService {
   login(data: LoginRequest): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/login`, data)
-
       .pipe(
         tap((response: AuthResponse) => {
-          if(response.success && response.data)
-          this.saveAuthData(response.data.token, response.data.user);
+          if (response.token) {
+            this.saveAuthData(response.token, {
+              fullName: response.fullName || '',
+              email: response.email || data.email
+            });
+          }
         }),
       );
   }
 
- saveAuthData(token:string,user:any){
-
-  localStorage.setItem('token',token);
-  localStorage.setItem('user',JSON.stringify(user));
- 
- 
+  saveAuthData(token: string, user: any) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   getToken(): string | null {
     return localStorage.getItem('token');
   }
+
   getUser(): any {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
@@ -54,6 +54,7 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   }
+
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
@@ -65,7 +66,6 @@ export class AuthService {
   validateResetToken(token:string):Observable<AuthResponse>{
     return this.http.post<AuthResponse>(
       `${this.apiUrl}/resetPassword`,token);
-    
   }
 
   forgotPassword(data: ForgotPasswordRequest): Observable<AuthResponse> {
