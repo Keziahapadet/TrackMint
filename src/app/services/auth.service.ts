@@ -6,6 +6,7 @@ import {
   AuthResponse,
   ForgotPasswordRequest,
   LoginRequest,
+  RefreshTokenRequest,
   RegisterRequest,
   ResetPasswordRequest,
 } from '../models/auth.interface';
@@ -18,26 +19,72 @@ export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
 
   register(data: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data);
+    return this.http.post<AuthResponse>
+      (`${this.apiUrl}/register`, data).pipe(
+        tap((response: AuthResponse) => {
+          if (response.token) {
+            this.saveAuthData(response.token,
+              response.refreshToken, {
+              fullName: response.fullName || '',
+              email: response.email
+            });
+          }
+        })
+      );
   }
 
   login(data: LoginRequest): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${this.apiUrl}/login`, data)
-      .pipe(
+    return this.http.post<AuthResponse>
+      (`${this.apiUrl}/login`, data).pipe(
         tap((response: AuthResponse) => {
           if (response.token) {
-            this.saveAuthData(response.token, {
+            this.saveAuthData(response.token,
+              response.refreshToken, {
               fullName: response.fullName || '',
               email: response.email || data.email
             });
           }
-        }),
+        })
       );
   }
 
-  saveAuthData(token: string, user: any) {
+  refreshToken(): Observable<AuthResponse> {
+    const refreshToken = this.getRefreshToken();
+    return this.http.post<AuthResponse>
+      (`${this.apiUrl}/refresh`,
+        { refreshToken }).pipe(
+        tap((response: AuthResponse) => {
+          if (response.token) {
+            localStorage.setItem('token', response.token);
+          }
+        })
+      );
+  }
+
+  logout(): void {
+    const refreshToken = this.getRefreshToken();
+    if (refreshToken) {
+      this.http.post(`${this.apiUrl}/logout`,
+        { refreshToken }).subscribe();
+    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+  }
+
+  forgotPassword(data: ForgotPasswordRequest): Observable<any> {
+    return this.http.post<any>
+      (`${this.apiUrl}/forgotPassword`, data);
+  }
+
+  resetPassword(data: ResetPasswordRequest): Observable<any> {
+    return this.http.post<any>
+      (`${this.apiUrl}/resetPassword`, data);
+  }
+
+  saveAuthData(token: string, refreshToken: string, user: any) {
     localStorage.setItem('token', token);
+    localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('user', JSON.stringify(user));
   }
 
@@ -45,30 +92,16 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
   getUser(): any {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   }
 
-  logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  }
-
   isLoggedIn(): boolean {
     return !!this.getToken();
-  }
-
-  resetPassword(data: ResetPasswordRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/resetPassword`, data);
-  }
-
-  validateResetToken(token:string):Observable<AuthResponse>{
-    return this.http.post<AuthResponse>(
-      `${this.apiUrl}/resetPassword`,token);
-  }
-
-  forgotPassword(data: ForgotPasswordRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/forgotPassword`, data);
   }
 }
