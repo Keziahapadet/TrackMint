@@ -13,6 +13,7 @@ import { CategorySpending, DashboardSummary } from '../../../models/dashboard.in
   styleUrls: ['./dashboard.component.scss'],
   changeDetection:ChangeDetectionStrategy.OnPush
 })
+
 export class DashboardComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private dashboardService = inject(DashboardService);
@@ -46,8 +47,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadDashboardData(): void {
+     this.dashboardService.clearCache();
     this.isLoading = true;
-    this.dashboardService.clearCache();
     this.errorMessage = '';
 
     console.log('Loading dashboard data...');
