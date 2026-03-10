@@ -47,6 +47,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadDashboardData(): void {
     this.isLoading = true;
+    this.dashboardService.clearCache();
     this.errorMessage = '';
 
     console.log('Loading dashboard data...');
