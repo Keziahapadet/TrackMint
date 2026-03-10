@@ -73,6 +73,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             console.log('Weekly chart updated');
             
             this.isLoading = false;
+            this.cdr.markForCheck()
             console.log('Loading complete!');
           } catch (error) {
             console.error('Error updating UI:', error);
