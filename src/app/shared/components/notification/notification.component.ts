@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -10,12 +10,14 @@ import { Notification } from '../../../models/notification.interface';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './notification.component.html',
-  styleUrls: ['./notification.component.scss']
+  styleUrls: ['./notification.component.scss'],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class NotificationComponent implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
+  private cdr =inject(ChangeDetectorRef)
 
   showDropdown = false;
   unreadCount = 0;
@@ -24,7 +26,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadNotifications();
-    this.notificationService.startPolling(30000); // Poll every 30 seconds
+    this.notificationService.startPolling(30000); 
     
     this.notificationService.unreadCount$
       .pipe(takeUntil(this.destroy$))
@@ -46,10 +48,13 @@ export class NotificationComponent implements OnInit, OnDestroy {
         next: (summary) => {
           this.notifications = summary.recentNotifications.slice(0, 5);
           this.isLoading = false;
+           this.cdr.markForCheck();
+          
         },
         error: (error) => {
           console.error('Error loading notifications:', error);
           this.isLoading = false;
+             this.cdr.markForCheck();
         }
       });
   }
