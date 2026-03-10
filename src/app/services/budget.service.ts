@@ -1,9 +1,10 @@
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
-import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError, throwError, shareReplay } from 'rxjs';
 import { Budget, BudgetProgress, BudgetRequest, BudgetSummary } from '../models/budget.interface';
 import { environment } from '../../environment/environment';
+import { DashboardSummary } from '../models/dashboard.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class BudgetService {
 
   private budgetsSubject = new BehaviorSubject<Budget[]>([]);
   budgets$ = this.budgetsSubject.asObservable();
+   private cache$: Observable<DashboardSummary> | null = null;
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -61,6 +63,7 @@ export class BudgetService {
     return this.http.get<Budget[]>(this.apiUrl, { 
       headers: this.getHeaders() 
     }).pipe(
+      shareReplay(1),
       tap((budgets: Budget[]) => {
         console.log('Budgets loaded successfully:', budgets);
         this.budgetsSubject.next(budgets);

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
@@ -11,12 +11,14 @@ import { Budget } from '../../../models/budget.interface';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './budgets.component.html',
-  styleUrls: ['./budgets.component.scss']
+  styleUrls: ['./budgets.component.scss'],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class BudgetsComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private budgetService = inject(BudgetService);
   private destroy$ = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef)
 
   budgetForm!: FormGroup;
   showModal = false;
@@ -68,11 +70,13 @@ export class BudgetsComponent implements OnInit, OnDestroy {
         next: (budgets) => {
           this.budgets = budgets;
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error loading budgets:', error);
           this.errorMessage = error.message;
           this.isLoading = false;
+           this.cdr.markForCheck();
         }
       });
   }
@@ -163,6 +167,7 @@ export class BudgetsComponent implements OnInit, OnDestroy {
           error: (error) => {
             console.error('Error deleting budget:', error);
             this.errorMessage = 'Failed to delete budget';
+             this.cdr.markForCheck();
           }
         });
     }
@@ -197,11 +202,13 @@ export class BudgetsComponent implements OnInit, OnDestroy {
             this.loadBudgets();
             this.closeModal();
             this.isLoading = false;
+            this.cdr.markForCheck();
           },
           error: (error) => {
             console.error('Error updating budget:', error);
             this.errorMessage = 'Failed to update budget';
             this.isLoading = false;
+            this.cdr.markForCheck();
           }
         });
     } else {
@@ -212,11 +219,13 @@ export class BudgetsComponent implements OnInit, OnDestroy {
             this.loadBudgets();
             this.closeModal();
             this.isLoading = false;
+            this.cdr.markForCheck();
           },
           error: (error) => {
             console.error('Error creating budget:', error);
             this.errorMessage = 'Failed to create budget';
             this.isLoading = false;
+            this.cdr.markForCheck();
           }
         });
     }

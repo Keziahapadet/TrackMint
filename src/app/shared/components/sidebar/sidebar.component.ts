@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, inject, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
@@ -9,11 +9,14 @@ import { filter } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+  styleUrls: ['./sidebar.component.scss'],
+  changeDetection:ChangeDetectionStrategy.OnPush
+
 })
 export class SidebarComponent implements OnInit {
   private router      = inject(Router);
   private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef)
 
   @Input() isOpen = false;
   @Output() closeSidebar = new EventEmitter<void>();
@@ -49,6 +52,7 @@ export class SidebarComponent implements OnInit {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         this.closeSidebar.emit();
+         this.cdr.markForCheck();
       });
   }
 

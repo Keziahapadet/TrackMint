@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
@@ -10,34 +10,35 @@ import { Category } from '../../../models/category.interface';
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule
+  ],
   templateUrl: './categories.component.html',
-  styleUrls: ['./categories.component.scss']
+  styleUrls: ['./categories.component.scss'],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class CategoriesComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private categoryService = inject(CategoryService);
   private destroy$ = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef)
 
   // Constants for UI
   colors = CATEGORY_COLORS;
   icons = CATEGORY_ICONS;
   
-  // Form
+
   categoryForm!: FormGroup;
   
-  // UI State
   showModal = false;
   isEditing = false;
   editingId = '';
   isLoading = false;
   errorMessage = '';
   
-  // Selected values for preview
   selectedColor = '#10B981';
   selectedIcon = 'restaurant';
 
-  // Data from backend
+ 
   categories: Category[] = [];
 
   ngOnInit(): void {
@@ -68,11 +69,13 @@ export class CategoriesComponent implements OnInit, OnDestroy {
         next: (categories) => {
           this.categories = categories;
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error loading categories:', error);
           this.errorMessage = error.message;
           this.isLoading = false;
+          this.cdr.markForCheck();
         }
       });
   }
@@ -130,6 +133,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
           error: (error) => {
             console.error('Error deleting category:', error);
             this.errorMessage = 'Failed to delete category';
+            this.cdr.markForCheck();
           }
         });
     }
@@ -145,6 +149,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
 
     const formValue = this.categoryForm.value;
     this.isLoading = true;
+     this.cdr.markForCheck();
 
     if (this.isEditing) {
       this.categoryService.updateCategory(this.editingId, formValue)
@@ -157,11 +162,13 @@ export class CategoriesComponent implements OnInit, OnDestroy {
             }
             this.closeModal();
             this.isLoading = false;
+             this.cdr.markForCheck();
           },
           error: (error) => {
             console.error('Error updating category:', error);
             this.errorMessage = 'Failed to update category';
             this.isLoading = false;
+             this.cdr.markForCheck();
           }
         });
     } else {
@@ -172,11 +179,13 @@ export class CategoriesComponent implements OnInit, OnDestroy {
             this.categories.push(newCategory);
             this.closeModal();
             this.isLoading = false;
+            this.cdr.markForCheck();
           },
           error: (error) => {
             console.error('Error creating category:', error);
             this.errorMessage = 'Failed to create category';
             this.isLoading = false;
+             this.cdr.markForCheck();
           }
         });
     }

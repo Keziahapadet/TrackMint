@@ -1,23 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
-import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 import { DashboardService } from '../../../services/dashboard.service';
 import { CategorySpending, DashboardSummary } from '../../../models/dashboard.interface';
 
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, HeaderComponent, SidebarComponent],
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private dashboardService = inject(DashboardService);
   private destroy$ = new Subject<void>();
+    private cdr = inject(ChangeDetectorRef);
 
   summaryCards: any[] = [];
   categorySpending: CategorySpending[] = [];
@@ -76,12 +76,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
             console.error('Error updating UI:', error);
             this.errorMessage = 'Error displaying dashboard data';
             this.isLoading = false;
+            this.cdr.markForCheck();
           }
         },
         error: (error) => {
           console.error('Error loading dashboard:', error);
           this.errorMessage = error.message || 'Failed to load dashboard data';
           this.isLoading = false;
+          this.cdr.markForCheck();
         }
       });
   }

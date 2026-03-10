@@ -1,12 +1,10 @@
-<div class="dashboard">
-  <!-- Loading State -->
+
   <div class="loading-state" *ngIf="isLoading">
     <div class="spinner"></div>
     <p>Loading dashboard data...</p>
-    <p class="loading-hint">This may take a few seconds...</p>
   </div>
 
-  <!-- Error State -->
+ 
   <div class="error-state" *ngIf="errorMessage && !isLoading">
     <div class="error-icon">
       <span class="material-icons">error</span>
@@ -18,9 +16,8 @@
     </button>
   </div>
 
-  <!-- Main Dashboard Content -->
+ 
   <div class="dashboard-content" *ngIf="!isLoading && !errorMessage">
-    <!-- Summary Cards -->
     <div class="summary-cards">
       <div 
         *ngFor="let card of summaryCards" 
@@ -44,9 +41,7 @@
       </div>
     </div>
 
-    <!-- Dashboard Grid -->
     <div class="dashboard-grid">
-      <!-- Spending Overview Chart -->
       <div class="card spending-overview">
         <div class="card-header-row">
           <h3 class="card-title-text">Spending Overview</h3>
@@ -89,7 +84,7 @@
         </div>
       </div>
 
-      <!-- Category Spending -->
+     
       <div class="card category-spending">
         <div class="card-header-row">
           <h3 class="card-title-text">By Category</h3>
@@ -124,7 +119,7 @@
         </div>
       </div>
 
-      <!-- Recent Transactions -->
+      
       <div class="card recent-transactions">
         <div class="card-header-row">
           <h3 class="card-title-text">Recent Transactions</h3>
@@ -174,4 +169,3 @@
       <span class="material-icons">add</span>
     </button>
   </div>
-</div>

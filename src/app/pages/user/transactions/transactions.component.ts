@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -11,13 +11,15 @@ import { Transaction, TransactionRequest } from '../../../models/transaction.int
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './transactions.component.html',
-  styleUrls: ['./transactions.component.scss']
+  styleUrls: ['./transactions.component.scss'],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class TransactionsComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private transactionService = inject(TransactionService);
   private destroy$ = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef)
 
   transactionForm!: FormGroup;
   filterForm!: FormGroup;
@@ -99,11 +101,13 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           this.transactions = transactions;
           this.applyFilters();
           this.isLoading = false;
+           this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error loading transactions:', error);
           this.errorMessage = 'Failed to load transactions. Please try again.';
           this.isLoading = false;
+           this.cdr.markForCheck();
         }
       });
   }
@@ -205,6 +209,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           error: (error) => {
             console.error('Error deleting transaction:', error);
             this.errorMessage = 'Failed to delete transaction. Please try again.';
+            this.cdr.markForCheck();
           }
         });
     }
@@ -252,6 +257,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         console.error('Error saving transaction:', error);
         this.errorMessage = 'Failed to save transaction. Please try again.';
         this.isLoading = false;
+         this.cdr.markForCheck();
       }
     });
   }

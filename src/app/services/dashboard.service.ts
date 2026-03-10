@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, shareReplay, throwError } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { DashboardSummary } from '../models/dashboard.interface';
 
@@ -11,6 +11,7 @@ import { DashboardSummary } from '../models/dashboard.interface';
 export class DashboardService {
   private http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/dashboard`;
+  private cache$: Observable<DashboardSummary> | null = null
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -20,13 +21,22 @@ export class DashboardService {
     });
   }
 
-  getDashboardSummary(): Observable<DashboardSummary> {
-    return this.http.get<DashboardSummary>(`${this.apiUrl}/summary`, {
-      headers: this.getHeaders()
-    }).pipe(
-      catchError(this.handleError)
-    );
+ getDashboardSummary(): Observable<DashboardSummary> {
+    if (!this.cache$) {                                             
+      this.cache$ = this.http.get<DashboardSummary>(`${this.apiUrl}/summary`, {
+        headers: this.getHeaders()
+      }).pipe(
+        shareReplay(1),                                            
+        catchError(this.handleError)
+      );
+    }
+    return this.cache$;                                             
   }
+
+  clearCache(): void {                                               
+    this.cache$ = null;
+  }
+
 
   private handleError(error: any) {
     console.error('Dashboard API Error:', error);
