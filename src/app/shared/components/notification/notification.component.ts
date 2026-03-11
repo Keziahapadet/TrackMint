@@ -28,6 +28,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadNotifications();
     this.notificationService.startPolling(30000);
+    document.addEventListener('click', this.onDocumentClick.bind(this));
 
     this.notificationService.unreadCount$
       .pipe(takeUntil(this.destroy$))
@@ -40,6 +41,12 @@ export class NotificationComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    document.removeEventListener('click', this.onDocumentClick.bind(this));
+  }
+
+  onDocumentClick(): void {
+    this.showDropdown = false;
+    this.cdr.markForCheck();
   }
 
   loadNotifications(): void {
