@@ -65,6 +65,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     if (this.showDropdown) {
       this.loadNotifications();
     }
+    this.cdr.markForCheck();
   }
 
   closeDropdown(): void {
