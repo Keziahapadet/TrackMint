@@ -32,6 +32,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(count => {
         this.unreadCount = count;
+        this.cdr.markForCheck();
       });
   }
 
