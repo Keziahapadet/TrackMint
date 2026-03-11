@@ -1,4 +1,4 @@
-// src/app/app.routes.ts
+
 
 import { Routes } from '@angular/router';
 import { RegisterComponent } from './pages/auth/register/register.component';

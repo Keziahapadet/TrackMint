@@ -35,7 +35,6 @@ export class ResetPasswordComponent implements OnInit {
       confirmPassword: ['', Validators.required]
     });
 
-    // Just read token from URL — no need to validate
     this.route.queryParams.subscribe(params => {
       this.resetToken = params['token'] || '';
       if (!this.resetToken) {
