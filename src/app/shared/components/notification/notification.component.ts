@@ -11,23 +11,24 @@ import { Notification } from '../../../models/notification.interface';
   imports: [CommonModule],
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
-  changeDetection:ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NotificationComponent implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
-  private cdr =inject(ChangeDetectorRef)
+  private cdr = inject(ChangeDetectorRef);
 
   showDropdown = false;
   unreadCount = 0;
   notifications: Notification[] = [];
   isLoading = false;
+  selectedNotification: Notification | null = null;
 
   ngOnInit(): void {
     this.loadNotifications();
-    this.notificationService.startPolling(30000); 
-    
+    this.notificationService.startPolling(30000);
+
     this.notificationService.unreadCount$
       .pipe(takeUntil(this.destroy$))
       .subscribe(count => {
@@ -49,13 +50,12 @@ export class NotificationComponent implements OnInit, OnDestroy {
         next: (summary) => {
           this.notifications = summary.recentNotifications.slice(0, 5);
           this.isLoading = false;
-           this.cdr.markForCheck();
-          
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error loading notifications:', error);
           this.isLoading = false;
-             this.cdr.markForCheck();
+          this.cdr.markForCheck();
         }
       });
   }
@@ -70,18 +70,43 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   closeDropdown(): void {
     this.showDropdown = false;
+    this.cdr.markForCheck();
+  }
+
+  openModal(notification: Notification): void {
+    this.selectedNotification = notification;
+    this.markAsRead(notification);
+    this.cdr.markForCheck();
+  }
+
+  closeModal(): void {
+    this.selectedNotification = null;
+    this.cdr.markForCheck();
+  }
+
+  navigateToLink(notification: Notification): void {
+    if (notification.link) {
+      this.router.navigate([notification.link]);
+      this.closeModal();
+      this.closeDropdown();
+    }
   }
 
   markAsRead(notification: Notification): void {
     if (!notification.read) {
       this.notificationService.markAsRead(notification.id)
         .pipe(takeUntil(this.destroy$))
-        .subscribe();
-    }
-    
-    if (notification.link) {
-      this.router.navigate([notification.link]);
-      this.closeDropdown();
+        .subscribe({
+          next: () => {
+            this.notifications = this.notifications.map(n =>
+              n.id === notification.id ? { ...n, read: true } : n
+            );
+            if (this.selectedNotification?.id === notification.id) {
+              this.selectedNotification = { ...notification, read: true };
+            }
+            this.cdr.markForCheck();
+          }
+        });
     }
   }
 
@@ -91,6 +116,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.notifications = this.notifications.map(n => ({ ...n, read: true }));
+          this.cdr.markForCheck();
         }
       });
   }
@@ -105,7 +131,12 @@ export class NotificationComponent implements OnInit, OnDestroy {
     if (confirm('Delete this notification?')) {
       this.notificationService.deleteNotification(id)
         .pipe(takeUntil(this.destroy$))
-        .subscribe();
+        .subscribe({
+          next: () => {
+            this.notifications = this.notifications.filter(n => n.id !== id);
+            this.cdr.markForCheck();
+          }
+        });
     }
   }
 

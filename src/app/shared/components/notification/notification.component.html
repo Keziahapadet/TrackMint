@@ -14,19 +14,17 @@
     </div>
 
     <div class="notifications-list">
-      <!-- Loading State -->
       <div class="loading-state" *ngIf="isLoading">
         <div class="spinner"></div>
         <p>Loading notifications...</p>
       </div>
 
-      <!-- Notifications -->
-      <div *ngFor="let notification of notifications" 
+      <div *ngFor="let notification of notifications"
            class="notification-item"
            [class.unread]="!notification.read"
-           (click)="markAsRead(notification)">
-        
-        <div class="notification-icon" 
+           (click)="openModal(notification)">
+
+        <div class="notification-icon"
              [style.background]="getNotificationColor(notification.type) + '20'">
           <span class="material-icons" [style.color]="getNotificationColor(notification.type)">
             {{ getNotificationIcon(notification.type) }}
@@ -39,11 +37,10 @@
             <span class="notification-time">{{ notification.timeAgo }}</span>
           </div>
           <p class="notification-message">{{ notification.message }}</p>
-          
-          <!-- Budget Progress Bar -->
+
           <div class="budget-progress" *ngIf="notification.percentage">
             <div class="progress-bar">
-              <div class="progress-fill" 
+              <div class="progress-fill"
                    [style.width.%]="notification.percentage"
                    [style.background]="notification.percentage >= 100 ? '#EF4444' : '#F59E0B'">
               </div>
@@ -51,7 +48,6 @@
             <span class="progress-text">{{ notification.percentage }}%</span>
           </div>
 
-          <!-- Amount Display -->
           <div class="amount-display" *ngIf="notification.amount">
             <span class="amount-label">Amount:</span>
             <span class="amount-value">ksh {{ notification.amount | number:'1.2-2' }}</span>
@@ -63,7 +59,6 @@
         </button>
       </div>
 
-      <!-- Empty State -->
       <div class="empty-state" *ngIf="!isLoading && notifications.length === 0">
         <span class="material-icons empty-icon">notifications_off</span>
         <p>No notifications</p>
@@ -75,6 +70,35 @@
         View all notifications
         <span class="material-icons">arrow_forward</span>
       </button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="selectedNotification" class="notification-modal-overlay" (click)="closeModal()">
+  <div class="notification-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="notification-icon" [style.background]="getNotificationColor(selectedNotification.type) + '20'">
+        <span class="material-icons" [style.color]="getNotificationColor(selectedNotification.type)">
+          {{ getNotificationIcon(selectedNotification.type) }}
+        </span>
+      </div>
+      <h3>{{ selectedNotification.title }}</h3>
+      <button class="close-btn" (click)="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="message">{{ selectedNotification.message }}</p>
+      <p class="time">🕐 {{ selectedNotification.timeAgo }}</p>
+      <span class="status-badge" [class.unread]="!selectedNotification.read">
+        {{ selectedNotification.read ? 'Read' : 'Unread' }}
+      </span>
+    </div>
+    <div class="modal-footer">
+      <button class="link-btn" *ngIf="selectedNotification.link" (click)="navigateToLink(selectedNotification)">
+        View Details
+      </button>
+      <button class="close-modal-btn" (click)="closeModal()">Close</button>
     </div>
   </div>
 </div>
