@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://trackmint-backend-production.up.railway.app/api'  
+  apiUrl: 'https://trackmint-backend-1.onrender.com/api'  
 };
